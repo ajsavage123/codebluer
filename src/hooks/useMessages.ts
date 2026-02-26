@@ -22,19 +22,33 @@ export interface EnrichedMessage extends Omit<Message, 'user'> {
 }
 
 // In-memory store of all messages (pre-seeded with mock data)
-let _allMessages: EnrichedMessage[] = mockMessages.map(m => ({
-  ...m,
-  user: m.user
-    ? {
-      id: m.user.id,
-      name: m.user.name ?? undefined,
-      avatar: undefined,
-      userType: 'emt' as UserType,
-      qualification: 'emt_basic' as QualificationType,
-      experienceYears: 3,
-    }
-    : undefined,
-}));
+const USER_PROFESSIONS: Record<string, { type: string, qual: string }> = {
+  'user-1': { type: 'paramedic', qual: 'advance_paramedic' },
+  'user-2': { type: 'paramedic', qual: 'paramedic' },
+  'user-3': { type: 'emt', qual: 'emt' },
+  'user-4': { type: 'hr', qual: 'hr' },
+  'user-5': { type: 'emt', qual: 'advance_emt' },
+  'user-6': { type: 'instructor', qual: 'instructor' },
+  'user-7': { type: 'emr', qual: 'emr' },
+  'user-8': { type: 'emt', qual: 'emt' },
+};
+
+let _allMessages: EnrichedMessage[] = mockMessages.map(m => {
+  const prof = USER_PROFESSIONS[m.userId] || { type: 'emt', qual: 'emt' };
+  return {
+    ...m,
+    user: m.user
+      ? {
+        id: m.user.id,
+        name: m.user.name ?? undefined,
+        avatar: undefined,
+        userType: prof.type as any,
+        qualification: prof.qual as any,
+        experienceYears: 3,
+      }
+      : undefined,
+  };
+});
 
 export function useMessages(roomId: string) {
   return useQuery({
@@ -75,9 +89,9 @@ export function useSendMessage() {
         user: {
           id: 'user-1',
           name: 'Alex Rivera',
-          userType: 'emt' as UserType,
-          qualification: 'emt_basic' as QualificationType,
-          experienceYears: 1,
+          userType: 'paramedic' as any,
+          qualification: 'advance_paramedic' as any,
+          experienceYears: 5,
         },
       };
       _allMessages = [..._allMessages, newMsg];

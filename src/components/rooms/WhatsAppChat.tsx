@@ -33,6 +33,17 @@ const ONLINE_COUNTS: Record<string, number> = {
   entrepreneurship: 34, certifications: 98, students: 76, library: 45,
 };
 
+const DESIGNATION_THEMES: Record<string, { bg: string, text: string, border: string, shadow: string }> = {
+  hr: { bg: 'bg-slate-50/80', text: 'text-slate-700', border: 'border-slate-200/50', shadow: 'shadow-slate-900/5' },
+  paramedic: { bg: 'bg-rose-50/80', text: 'text-rose-700', border: 'border-rose-200/50', shadow: 'shadow-rose-900/5' },
+  emr: { bg: 'bg-emerald-50/80', text: 'text-emerald-700', border: 'border-emerald-200/50', shadow: 'shadow-emerald-900/5' },
+  emt: { bg: 'bg-blue-50/80', text: 'text-blue-700', border: 'border-blue-200/50', shadow: 'shadow-blue-900/5' },
+  advance_emt: { bg: 'bg-sky-50/80', text: 'text-sky-700', border: 'border-sky-200/50', shadow: 'shadow-sky-900/5' },
+  advance_paramedic: { bg: 'bg-red-50/80', text: 'text-red-700', border: 'border-red-200/50', shadow: 'shadow-red-900/5' },
+  instructor: { bg: 'bg-amber-50/80', text: 'text-amber-700', border: 'border-amber-200/50', shadow: 'shadow-amber-900/5' },
+  default: { bg: 'bg-slate-50/80', text: 'text-slate-600', border: 'border-slate-200/50', shadow: 'shadow-slate-900/5' }
+};
+
 // ─── Room-Specific Themes ────────────────────────────────────────────────────
 
 interface RoomTheme {
@@ -114,7 +125,7 @@ function ChatHeader({ room, onBack, isSearchOpen, setIsSearchOpen, searchQuery, 
   const online = ONLINE_COUNTS[room.type] ?? 0;
 
   return (
-    <div className={cn("flex flex-col text-white shadow-md z-30 shrink-0", theme.header)}>
+    <div className={cn("flex flex-col text-white shadow-md z-50 sticky top-0", theme.header)}>
       <div className="flex items-center gap-3 px-4 py-2.5">
         {!isSearchOpen ? (
           <>
@@ -191,6 +202,29 @@ function Bubble({
   const displayName = showAnon ? 'Anonymous' : (msg.user?.name ?? 'User');
   const avatarUrl = useMemo(() => msg.user?.avatar || getClayAvatar(msg.userId), [msg.userId, msg.user?.avatar]);
 
+  // Designation Badge Logic
+  const badge = useMemo(() => {
+    if (showAnon || !msg.user) return null;
+
+    // Format label strictly to requested list
+    let rawLabel = (msg.user.qualification || msg.user.userType || 'Professional').toLowerCase();
+
+    let label = '';
+    const themes = DESIGNATION_THEMES;
+    let theme = { bg: 'bg-slate-50/80', text: 'text-slate-600', border: 'border-slate-200/50', shadow: 'shadow-slate-900/5' }; // Default theme
+
+    if (rawLabel === 'hr') { label = 'HR / RECRUITER'; theme = themes.hr; }
+    else if (rawLabel === 'paramedic') { label = 'PARAMEDIC'; theme = themes.paramedic; }
+    else if (rawLabel === 'emr') { label = 'EMR'; theme = themes.emr; }
+    else if (rawLabel === 'emt') { label = 'EMT'; theme = themes.emt; }
+    else if (rawLabel.includes('advance') && rawLabel.includes('emt')) { label = 'ADVANCE EMT'; theme = themes.advance_emt; }
+    else if (rawLabel.includes('advance') && rawLabel.includes('paramedic')) { label = 'ADVANCE PARAMEDIC'; theme = themes.advance_paramedic; }
+    else if (rawLabel === 'instructor') { label = 'INSTRUCTOR'; theme = themes.instructor; }
+    else { label = rawLabel.toUpperCase().replace(/_/g, ' '); }
+
+    return { label, theme };
+  }, [msg.user, showAnon]);
+
   // Swipe-to-reply simulation
   const [dragX, setDragX] = useState(0);
   const startX = useRef(0);
@@ -210,14 +244,14 @@ function Bubble({
       id={msg.id}
       className={cn(
         'flex gap-2 px-3 relative transition-transform duration-200',
-        isOwn ? 'justify-end' : 'justify-start',
-        showName && 'mt-3',
-        !showAvatar && !isOwn && 'ml-12'
+        isOwn ? 'flex-row-reverse' : 'flex-row',
+        showName && 'mt-4',
       )}
       style={{ transform: `translateX(${dragX}px)` }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      onClick={(e) => { e.stopPropagation(); onCtx(e, msg); }}
     >
       {dragX > 20 && (
         <div className="absolute left-[-20px] top-1/2 -translate-y-1/2 text-primary opacity-50">
@@ -225,7 +259,7 @@ function Bubble({
         </div>
       )}
 
-      {!isOwn && showAvatar && (
+      {showAvatar ? (
         <div className="w-[42px] h-[42px] shrink-0 self-end mb-0.5 relative">
           <div className="absolute inset-0 rounded-[18px] bg-gradient-to-br from-white/50 to-black/10 blur-[1px]" />
           <div className="relative w-full h-full rounded-[18px] bg-white overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1),inset_0_-2px_4px_rgba(0,0,0,0.1),inset_0_2px_4px_rgba(255,255,255,1)] border border-slate-200">
@@ -236,11 +270,28 @@ function Bubble({
             />
           </div>
         </div>
+      ) : (
+        <div className="w-[42px] shrink-0" />
       )}
 
-      <div className={cn('flex flex-col max-w-[82%]', isOwn && 'items-end')}>
+      <div className={cn('flex flex-col max-w-[82%]', isOwn ? 'items-end' : 'items-start')}>
+        {showName && (
+          <div className={cn("flex items-center gap-1.5 mb-1 px-1", isOwn && "flex-row-reverse")}>
+            <span className={cn("text-[12px] font-bold", theme.nameColor)}>
+              {isOwn ? 'You' : displayName}
+            </span>
+            {badge && (
+              <span className={cn(
+                "inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border backdrop-blur-sm transition-all shadow-sm",
+                badge.theme.bg, badge.theme.text, badge.theme.border, badge.theme.shadow
+              )}>
+                {badge.label}
+              </span>
+            )}
+          </div>
+        )}
+
         <div
-          onContextMenu={(e) => { e.preventDefault(); onCtx(e, msg); }}
           className={cn(
             'relative px-3.5 py-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.05)] min-w-[80px] transition-all duration-300',
             theme.bubbleColor, theme.textColor,
@@ -256,17 +307,11 @@ function Bubble({
 
           {msg.replyTo && (
             <div className="mb-2 p-2 bg-black/5 rounded-xl border-l-[3px] border-primary/20 text-[11px] italic text-slate-500 max-w-full truncate">
-              Original message...
+              {/* Reply preview placeholder */}
             </div>
           )}
 
-          {!isOwn && showName && (
-            <p className={cn("text-[12px] font-bold mb-0.5", theme.nameColor)}>
-              {displayName}
-            </p>
-          )}
-
-          <div className="text-[14px] leading-relaxed break-words whitespace-pre-wrap pr-10">
+          <div className="text-[14px] leading-relaxed break-words whitespace-pre-wrap pr-10 pb-2">
             {msg.content}
           </div>
 
@@ -492,17 +537,19 @@ export function WhatsAppChat({ room, onBack }: WhatsAppChatProps) {
             <button onClick={() => { setReplyingTo(ctx.msg); setCtx(null); }} className="w-full px-4 py-3 text-left text-[14px] flex items-center gap-3 hover:bg-slate-50 transition-colors text-slate-700 font-bold">
               <MessageCircle className="w-4 h-4 text-blue-500" /> Reply
             </button>
-            <button
-              onClick={() => {
-                setPinnedIds(p => { const s = new Set(p); s.has(ctx.msg.id) ? s.delete(ctx.msg.id) : s.add(ctx.msg.id); return s; });
-                setCtx(null);
-                toast({ title: pinnedIds.has(ctx.msg.id) ? 'Message unpinned' : 'Message pinned successfully' });
-              }}
-              className="w-full px-4 py-3 text-left text-[14px] flex items-center gap-3 hover:bg-slate-50 transition-colors text-slate-700 font-bold"
-            >
-              <Pin className={cn("w-4 h-4", pinnedIds.has(ctx.msg.id) ? "text-red-500" : "text-orange-500")} />
-              {pinnedIds.has(ctx.msg.id) ? 'Unpin' : 'Pin'}
-            </button>
+            {user?.id === ctx.msg.userId && (
+              <button
+                onClick={() => {
+                  setPinnedIds(p => { const s = new Set(p); s.has(ctx.msg.id) ? s.delete(ctx.msg.id) : s.add(ctx.msg.id); return s; });
+                  setCtx(null);
+                  toast({ title: pinnedIds.has(ctx.msg.id) ? 'Message unpinned' : 'Message pinned successfully' });
+                }}
+                className="w-full px-4 py-3 text-left text-[14px] flex items-center gap-3 hover:bg-slate-50 transition-colors text-slate-700 font-bold"
+              >
+                <Pin className={cn("w-4 h-4", pinnedIds.has(ctx.msg.id) ? "text-red-500" : "text-orange-500")} />
+                {pinnedIds.has(ctx.msg.id) ? 'Unpin' : 'Pin'}
+              </button>
+            )}
             <button onClick={() => { navigator.clipboard.writeText(ctx.msg.content); setCtx(null); toast({ title: 'Copied' }); }} className="w-full px-4 py-3 text-left text-[14px] flex items-center gap-3 hover:bg-slate-50 transition-colors text-slate-700 font-bold">
               <Copy className="w-4 h-4 text-slate-500" /> Copy
             </button>
