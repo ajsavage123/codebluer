@@ -182,7 +182,7 @@ function ChatHeader({ room, onBack, isSearchOpen, setIsSearchOpen, searchQuery, 
 }
 
 function Bubble({
-  msg, isOwn, isAnonymousRoom, showAvatar, showName, isPinned, theme, onCtx, onReply
+  msg, isOwn, isAnonymousRoom, showAvatar, showName, isPinned, theme, onCtx, onReply, allMessages
 }: {
   msg: EnrichedMessage;
   isOwn: boolean;
@@ -193,6 +193,7 @@ function Bubble({
   theme: RoomTheme;
   onCtx: (e: any, m: EnrichedMessage) => void;
   onReply: () => void;
+  allMessages: EnrichedMessage[];
 }) {
   const showAnon = isAnonymousRoom || msg.isAnonymous;
   const displayName = showAnon ? 'Anonymous' : (msg.user?.name ?? 'User');
@@ -302,8 +303,26 @@ function Bubble({
           )}
 
           {msg.replyTo && (
-            <div className="mb-2 p-2 bg-black/5 rounded-xl border-l-[3px] border-primary/20 text-[11px] italic text-slate-500 max-w-full truncate">
-              {/* Reply preview placeholder */}
+            <div
+              className="mb-2 p-2 bg-black/5 rounded-xl border-l-[3px] border-primary/40 text-[11px] italic text-slate-500 max-w-full cursor-pointer hover:bg-black/10 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                const el = document.getElementById(msg.replyTo!);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.classList.add('animate-pulse-gold');
+                  setTimeout(() => el.classList.remove('animate-pulse-gold'), 3000);
+                }
+              }}
+            >
+              <div className="font-bold text-[9px] uppercase mb-0.5 text-primary/80 not-italic">
+                {allMessages.find(m => m.id === msg.replyTo)?.isAnonymous
+                  ? 'Anonymous'
+                  : (allMessages.find(m => m.id === msg.replyTo)?.user?.name || 'User')}
+              </div>
+              <div className="truncate">
+                {allMessages.find(m => m.id === msg.replyTo)?.content || 'Message deleted or unavailable'}
+              </div>
             </div>
           )}
 
@@ -451,6 +470,7 @@ export function WhatsAppChat({ room, onBack }: WhatsAppChatProps) {
               theme={theme}
               onCtx={(e, msg) => setCtx({ x: e.clientX || e.pageX || 100, y: e.clientY || e.pageY || 200, msg })}
               onReply={() => setReplyingTo(m)}
+              allMessages={messages}
             />
           </div>
         ))}
