@@ -242,7 +242,7 @@ function Bubble({
       className={cn(
         'flex gap-2 px-3 relative transition-transform duration-200',
         isOwn ? 'flex-row-reverse' : 'flex-row',
-        showName && 'mt-4',
+        showName && 'mt-2',
       )}
       style={{ transform: `translateX(${dragX}px)` }}
       onTouchStart={onTouchStart}
@@ -257,23 +257,23 @@ function Bubble({
       )}
 
       {showAvatar ? (
-        <div className="w-[42px] h-[42px] shrink-0 self-end mb-0.5 relative">
-          <div className="absolute inset-0 rounded-[18px] bg-gradient-to-br from-white/50 to-black/10 blur-[1px]" />
-          <div className="relative w-full h-full rounded-[18px] bg-white overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1),inset_0_-2px_4px_rgba(0,0,0,0.1),inset_0_2px_4px_rgba(255,255,255,1)] border border-slate-200">
+        <div className="w-[32px] h-[32px] shrink-0 self-start mt-0.5 relative">
+          <div className="absolute inset-0 rounded-[12px] bg-gradient-to-br from-white/50 to-black/10 blur-[1px]" />
+          <div className="relative w-full h-full rounded-[12px] bg-white overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1),inset_0_-2px_4px_rgba(0,0,0,0.1),inset_0_2px_4px_rgba(255,255,255,1)] border border-slate-200">
             <img
               src={avatarUrl}
               alt={displayName}
-              className="w-full h-full object-cover p-1 animate-in zoom-in-50 duration-500"
+              className="w-full h-full object-cover p-0.5 animate-in zoom-in-50 duration-500"
             />
           </div>
         </div>
       ) : (
-        <div className="w-[42px] shrink-0" />
+        <div className="w-[32px] shrink-0" />
       )}
 
       <div className={cn('flex flex-col max-w-[82%]', isOwn ? 'items-end' : 'items-start')}>
         {showName && (
-          <div className={cn("flex items-center gap-1.5 mb-1 px-1", isOwn && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-1.5 mb-0.5 px-0.5", isOwn && "flex-row-reverse")}>
             <span className={cn("text-[12px] font-bold", theme.nameColor)}>
               {isOwn ? 'You' : displayName}
             </span>
@@ -396,8 +396,9 @@ export function WhatsAppChat({ room, onBack }: WhatsAppChatProps) {
   const groupedMessages = useMemo(() => filteredMessages.map((m, i) => {
     const prev = filteredMessages[i - 1];
     const first = !prev || prev.userId !== m.userId || !isSameDay(prev.createdAt, m.createdAt);
-    const last = !filteredMessages[i + 1] || filteredMessages[i + 1].userId !== m.userId || !isSameDay(filteredMessages[i + 1].createdAt, m.createdAt);
-    return { ...m, showName: first, showAvatar: last };
+    const next = filteredMessages[i + 1];
+    const last = !next || next.userId !== m.userId || !isSameDay(next.createdAt, m.createdAt);
+    return { ...m, showName: first, showAvatar: first };
   }), [filteredMessages]);
 
   return (
