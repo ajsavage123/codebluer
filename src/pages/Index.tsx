@@ -18,6 +18,7 @@ import { Room, Tool } from '@/types';
 import { TrendingUp, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect } from 'react';
 
 type Screen = 'main' | 'room-chat' | 'salary-insights';
 
@@ -29,26 +30,46 @@ export default function Index() {
   const { data: rooms = [], isLoading: roomsLoading } = useRooms();
   const { data: tools = [], isLoading: toolsLoading } = useTools();
 
+  // Handle Mobile Back Button
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // If we go back and the state is empty, reset to main screen
+      if (currentScreen !== 'main') {
+        setCurrentScreen('main');
+        setSelectedRoom(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentScreen]);
+
   const handleRoomSelect = (room: Room) => {
     setSelectedRoom(room);
     setCurrentScreen('room-chat');
+    // Push state so back button works
+    window.history.pushState({ screen: 'room-chat' }, '');
   };
 
   const handleBackFromChat = () => {
-    setCurrentScreen('main');
-    setSelectedRoom(null);
+    if (currentScreen !== 'main') {
+      window.history.back(); // This will trigger popstate listener
+    }
   };
 
   const handleToolClick = (tool: Tool) => {
     if (tool.type === 'internal' && tool.category === 'salary') {
       setCurrentScreen('salary-insights');
+      window.history.pushState({ screen: 'salary' }, '');
     } else if (tool.url) {
       window.open(tool.url, '_blank');
     }
   };
 
   const handleBackFromSalary = () => {
-    setCurrentScreen('main');
+    if (currentScreen !== 'main') {
+      window.history.back();
+    }
   };
 
   const renderContent = () => {
