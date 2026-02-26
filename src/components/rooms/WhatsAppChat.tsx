@@ -385,7 +385,7 @@ export function WhatsAppChat({ room, onBack }: WhatsAppChatProps) {
   }), [filteredMessages]);
 
   return (
-    <div className={cn("flex flex-col h-screen overflow-hidden relative font-sans transition-colors duration-500", theme.bg)}>
+    <div className={cn("flex flex-col h-[100dvh] overflow-hidden fixed inset-0 z-[100] font-sans transition-colors duration-500", theme.bg)}>
       <div
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{

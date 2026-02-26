@@ -200,7 +200,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto relative">
+    <div className="min-h-[100dvh] bg-background max-w-lg mx-auto relative flex flex-col overflow-x-hidden">
       {currentScreen === 'main' && (
         <Header
           title={getHeaderTitle()}

@@ -215,7 +215,7 @@ export function RedditChat({ room, onBack }: RedditChatProps) {
     ];
 
     return (
-        <div className="flex flex-col h-screen bg-background">
+        <div className="flex flex-col h-[100dvh] fixed inset-0 z-[100] bg-background">
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3 bg-primary text-primary-foreground shadow-md">
                 <Button variant="ghost" size="icon-sm" onClick={onBack} className="text-primary-foreground hover:bg-primary-foreground/10">

@@ -166,7 +166,7 @@ function PostDetail({ post, onBack, setPost }: { post: QAPost; onBack: () => voi
     };
 
     return (
-        <div className="flex flex-col h-screen bg-background">
+        <div className="flex flex-col h-[100dvh] fixed inset-0 z-[100] bg-background">
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[hsl(24,95%,43%)] to-[hsl(24,95%,55%)] text-white shadow-lg">
                 <button onClick={onBack} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
@@ -331,7 +331,7 @@ export function QAForumChat({ room, onBack }: QAForumChatProps) {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-background">
+        <div className="flex flex-col h-[100dvh] fixed inset-0 z-[100] bg-background">
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[hsl(24,95%,43%)] to-[hsl(24,95%,55%)] text-white shadow-lg">
                 <button onClick={onBack} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
