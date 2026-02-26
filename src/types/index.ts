@@ -5,17 +5,20 @@ export interface User {
   name?: string;
   role: UserRole;
   avatar?: string;
+  gender?: 'male' | 'female';
+  qualification?: string;
+  userType?: string;
   createdAt: Date;
 }
 
-export type RoomType = 
-  | 'general' 
-  | 'salary' 
-  | 'career' 
-  | 'leadership' 
-  | 'entrepreneurship' 
-  | 'certifications' 
-  | 'students' 
+export type RoomType =
+  | 'general'
+  | 'salary'
+  | 'career'
+  | 'leadership'
+  | 'entrepreneurship'
+  | 'certifications'
+  | 'students'
   | 'library';
 
 export interface Room {

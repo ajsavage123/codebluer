@@ -7,6 +7,7 @@ import { Room } from '@/types';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import { getClayAvatar } from '@/lib/avatars';
 
 interface QAPost {
     id: string;
@@ -14,6 +15,7 @@ interface QAPost {
     body: string;
     authorName: string;
     authorBadge: string;
+    authorGender?: 'male' | 'female';
     upvotes: number;
     answers: QAAnswer[];
     status: 'open' | 'resolved';
@@ -25,6 +27,7 @@ interface QAAnswer {
     body: string;
     authorName: string;
     authorBadge: string;
+    authorGender?: 'male' | 'female';
     upvotes: number;
     isAccepted: boolean;
     createdAt: Date;
@@ -36,31 +39,31 @@ const MOCK_QA: QAPost[] = [
         id: 'q1', status: 'open',
         title: 'Are mandatory overtime rules being violated in private ambulance services?',
         body: 'My employer has been forcing us to work beyond 16 hours without proper compensation. Is this legal under EMS labor laws? Any HR contacts or unions we can reach out to?',
-        authorName: 'Jordan Chen', authorBadge: 'Paramedic · 5yr',
+        authorName: 'Jordan Chen', authorBadge: 'Paramedic · 5yr', authorGender: 'male',
         upvotes: 47, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
         answers: [
-            { id: 'a1', body: 'This is a clear violation of FLSA standards. You should document every shift with timestamps and file a complaint with your state labor board. Also, NAEMSP has resources for exactly this.', authorName: 'Sam Rivera', authorBadge: 'EMT · 8yr', upvotes: 34, isAccepted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), userVote: null },
-            { id: 'a2', body: 'Check with your union rep first. Many states have specific EMS labor protections beyond federal law. Keep records of everything.', authorName: 'Riley M.', authorBadge: 'Paramedic · 3yr', upvotes: 18, isAccepted: false, createdAt: new Date(Date.now() - 1000 * 60 * 60), userVote: null },
+            { id: 'a1', body: 'This is a clear violation of FLSA standards. You should document every shift with timestamps and file a complaint with your state labor board. Also, NAEMSP has resources for exactly this.', authorName: 'Sam Rivera', authorBadge: 'EMT · 8yr', authorGender: 'female', upvotes: 34, isAccepted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), userVote: null },
+            { id: 'a2', body: 'Check with your union rep first. Many states have specific EMS labor protections beyond federal law. Keep records of everything.', authorName: 'Riley M.', authorBadge: 'Paramedic · 3yr', authorGender: 'male', upvotes: 18, isAccepted: false, createdAt: new Date(Date.now() - 1000 * 60 * 60), userVote: null },
         ],
     },
     {
         id: 'q2', status: 'open',
         title: 'What are our rights when denied PPE during high-risk calls?',
         body: 'Station management has been restricting N95 usage claiming shortage. We had three confirmed COVID exposures last month. What steps can we take?',
-        authorName: 'Anonymous', authorBadge: 'EMT',
+        authorName: 'Anonymous', authorBadge: 'EMT', authorGender: 'female',
         upvotes: 89, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8),
         answers: [
-            { id: 'a3', body: 'OSHA 29 CFR 1910.134 requires employers to provide appropriate respiratory protection. File an anonymous OSHA complaint immediately — retaliation is illegal.', authorName: 'Medical Director', authorBadge: 'EMS Physician', upvotes: 62, isAccepted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6), userVote: null },
+            { id: 'a3', body: 'OSHA 29 CFR 1910.134 requires employers to provide appropriate respiratory protection. File an anonymous OSHA complaint immediately — retaliation is illegal.', authorName: 'Medical Director', authorBadge: 'EMS Physician', authorGender: 'male', upvotes: 62, isAccepted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6), userVote: null },
         ],
     },
     {
         id: 'q3', status: 'resolved',
         title: 'Night shift differential — is it mandatory for government EMS?',
         body: "Our new contract removes night shift pay differentials. Other government employees in the same department still get it. Is there a legal basis to challenge this?",
-        authorName: 'Alex P.', authorBadge: 'Paramedic · 10yr',
+        authorName: 'Alex P.', authorBadge: 'Paramedic · 10yr', authorGender: 'male',
         upvotes: 31, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
         answers: [
-            { id: 'a4', body: 'It depends on your CBA. If the union negotiated differential pay for other classifications, EMS may be entitled under equal treatment clauses. Consult your union steward.', authorName: 'HR Specialist', authorBadge: 'EMS HR Manager', upvotes: 29, isAccepted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 20), userVote: null },
+            { id: 'a4', body: 'It depends on your CBA. If the union negotiated differential pay for other classifications, EMS may be entitled under equal treatment clauses. Consult your union steward.', authorName: 'HR Specialist', authorBadge: 'EMS HR Manager', authorGender: 'female', upvotes: 29, isAccepted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 20), userVote: null },
         ],
     },
 ];
@@ -188,8 +191,8 @@ function PostDetail({ post, onBack, setPost }: { post: QAPost; onBack: () => voi
                 {/* Question */}
                 <div className="p-4 border-b border-border">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-xs font-bold text-orange-600">
-                            {post.authorName[0]}
+                        <div className="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border border-border shadow-sm">
+                            <img src={getClayAvatar(post.id, post.authorGender, post.authorName)} alt="" className="w-full h-full object-cover" />
                         </div>
                         <div>
                             <p className="text-xs font-bold text-foreground">{post.authorName}</p>
@@ -231,8 +234,8 @@ function PostDetail({ post, onBack, setPost }: { post: QAPost; onBack: () => voi
                                 </div>
                             )}
                             <div className="flex items-center gap-2 mb-2">
-                                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                                    {ans.authorName[0]}
+                                <div className="w-7 h-7 rounded-full bg-slate-100 overflow-hidden border border-border">
+                                    <img src={getClayAvatar(ans.id, ans.authorGender, ans.authorName)} alt="" className="w-full h-full object-cover" />
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold text-foreground">{ans.authorName}</p>

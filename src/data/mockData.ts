@@ -92,13 +92,13 @@ export const systemRooms: Room[] = [
 ];
 
 export const mockUsers: User[] = [
-  { id: 'user-2', name: 'Jordan Chen', role: 'verified', createdAt: new Date() },
-  { id: 'user-3', name: 'Sam Martinez', role: 'user', createdAt: new Date() },
-  { id: 'user-4', name: 'Riley Thompson', role: 'paid', createdAt: new Date() },
-  { id: 'user-5', name: 'Morgan Lee', role: 'user', createdAt: new Date() },
-  { id: 'user-6', name: 'Casey Wong', role: 'verified', createdAt: new Date() },
-  { id: 'user-7', name: 'Taylor Kim', role: 'user', createdAt: new Date() },
-  { id: 'user-8', name: 'Jamie Patel', role: 'paid', createdAt: new Date() },
+  { id: 'user-2', name: 'Jordan Chen', role: 'verified', gender: 'male', qualification: 'paramedic', createdAt: new Date() },
+  { id: 'user-3', name: 'Sam Martinez', role: 'user', gender: 'female', qualification: 'emt', createdAt: new Date() },
+  { id: 'user-4', name: 'Riley Thompson', role: 'paid', gender: 'male', qualification: 'advance_emt', createdAt: new Date() },
+  { id: 'user-5', name: 'Morgan Lee', role: 'user', gender: 'female', qualification: 'emr', createdAt: new Date() },
+  { id: 'user-6', name: 'Casey Wong', role: 'verified', gender: 'male', qualification: 'instructor', createdAt: new Date() },
+  { id: 'user-7', name: 'Taylor Kim', role: 'user', gender: 'female', qualification: 'hr', createdAt: new Date() },
+  { id: 'user-8', name: 'Jamie Patel', role: 'paid', gender: 'male', qualification: 'paramedic', createdAt: new Date() },
 ];
 
 const now = Date.now();

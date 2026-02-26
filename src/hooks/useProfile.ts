@@ -13,6 +13,7 @@ interface Profile {
   userId: string;
   name: string | null;
   avatarUrl: string | null;
+  gender?: 'male' | 'female';
   userType: UserType | null;
   qualification: QualificationType | null;
   sector: SectorType | null;

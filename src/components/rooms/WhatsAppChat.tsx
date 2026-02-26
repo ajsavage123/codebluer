@@ -11,6 +11,7 @@ import { useMessages, useSendMessage, EnrichedMessage } from '@/hooks/useMessage
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
+import { getClayAvatar } from '@/lib/avatars';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -21,12 +22,7 @@ function fmtDate(d: Date) {
   return format(d, 'dd MMM yyyy');
 }
 
-/** 
- * Refined Claymorphic Avatar Style.
- */
-const getClayAvatar = (seed: string) => {
-  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=c0aede,b6e3f4,d1d4f9,ffd5dc,ffdfbf`;
-};
+// ─── Online counts placeholder ────────────────────────────────────────────────
 
 const ONLINE_COUNTS: Record<string, number> = {
   general: 142, salary: 89, career: 67, leadership: 53,
@@ -200,7 +196,7 @@ function Bubble({
 }) {
   const showAnon = isAnonymousRoom || msg.isAnonymous;
   const displayName = showAnon ? 'Anonymous' : (msg.user?.name ?? 'User');
-  const avatarUrl = useMemo(() => msg.user?.avatar || getClayAvatar(msg.userId), [msg.userId, msg.user?.avatar]);
+  const avatarUrl = useMemo(() => msg.user?.avatar || getClayAvatar(msg.userId, msg.user?.gender as any, msg.user?.name), [msg.userId, msg.user?.avatar, msg.user?.gender, msg.user?.name]);
 
   // Designation Badge Logic
   const badge = useMemo(() => {

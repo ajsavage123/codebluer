@@ -8,6 +8,7 @@ import { toast } from '@/hooks/use-toast';
 import { UserBadge } from './UserBadge';
 import { AvatarUploadDialog } from './AvatarUploadDialog';
 import { cn } from '@/lib/utils';
+import { getClayAvatar } from '@/lib/avatars';
 
 export function UserProfile() {
   const { user, signOut } = useAuth();
@@ -61,8 +62,12 @@ export function UserProfile() {
                   className="w-24 h-24 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-3xl font-bold text-primary-foreground">
-                  {profile?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
+                <div className="w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-2 border-slate-200 shadow-inner">
+                  <img
+                    src={getClayAvatar(user?.id || 'guest', profile?.gender as any, profile?.name)}
+                    alt="Default Avatar"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               )}
               <button

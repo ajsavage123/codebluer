@@ -12,6 +12,7 @@ export interface MessageUser {
   id: string;
   name?: string;
   avatar?: string;
+  gender?: 'male' | 'female';
   userType: UserType | null;
   qualification: QualificationType | null;
   experienceYears: number;
@@ -41,7 +42,8 @@ let _allMessages: EnrichedMessage[] = mockMessages.map(m => {
       ? {
         id: m.user.id,
         name: m.user.name ?? undefined,
-        avatar: undefined,
+        avatar: m.user.avatar,
+        gender: m.user.gender,
         userType: prof.type as any,
         qualification: prof.qual as any,
         experienceYears: 3,
