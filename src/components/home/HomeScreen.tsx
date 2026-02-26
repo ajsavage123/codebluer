@@ -27,11 +27,11 @@ export function HomeScreen({ onRoomSelect, onViewAllTrending, onViewAllRooms }: 
       <section className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-5 text-primary-foreground">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-xl font-bold mb-1">
-              Welcome back, {profile?.name ? profile.name.split(' ')[0] : 'EMR'} 👋
+            <h1 className="text-xl font-bold mb-1 leading-tight">
+              Welcome back to EMR COMMUNITY, {profile?.name ? profile.name.split(' ')[0] : 'Partner'} 👋
             </h1>
-            <p className="text-primary-foreground/80 text-sm font-medium">
-              EMR COMMUNITY
+            <p className="text-primary-foreground/90 text-sm font-medium">
+              We're glad to have you back on the frontlines.
             </p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
