@@ -12,6 +12,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import { getClayAvatar } from '@/lib/avatars';
+import { mockUsers } from '@/data/mockData';
+import { User } from '@/types';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -328,7 +331,12 @@ function Bubble({
           )}
 
           <div className="text-[14px] leading-relaxed break-words whitespace-pre-wrap pr-10 pb-2">
-            {msg.content}
+            {msg.content.split(/(@\w+)/g).map((part, i) => {
+              if (part.startsWith('@')) {
+                return <span key={i} className="text-blue-600 font-bold hover:underline cursor-pointer">{part}</span>;
+              }
+              return part;
+            })}
           </div>
 
           <div className="absolute right-2 bottom-1 flex items-center gap-1 opacity-50">
@@ -357,6 +365,11 @@ export function WhatsAppChat({ room, onBack }: WhatsAppChatProps) {
   // Search state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Mention stats
+  const [mentionSearch, setMentionSearch] = useState('');
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionIndex, setMentionIndex] = useState(-1);
 
   const endRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
@@ -524,12 +537,59 @@ export function WhatsAppChat({ room, onBack }: WhatsAppChatProps) {
           )}
         </div>
 
-        <div className="flex-1 bg-slate-100 rounded-2xl px-4 py-2.5 min-h-[48px] flex items-center shadow-inner focus-within:bg-white focus-within:shadow-md transition-all border border-transparent focus-within:border-slate-200">
+        <div className="flex-1 bg-slate-100 rounded-2xl px-4 py-2.5 min-h-[48px] flex items-center shadow-inner focus-within:bg-white focus-within:shadow-md transition-all border border-transparent focus-within:border-slate-200 relative">
+          {showMentions && (
+            <div className="absolute bottom-full left-0 mb-3 w-64 bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-xl overflow-hidden animate-in slide-in-from-bottom-2 duration-200 z-[60]">
+              <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mention Community Member</p>
+              </div>
+              <div className="max-h-48 overflow-y-auto">
+                {mockUsers.filter(u => u.name?.toLowerCase().includes(mentionSearch.toLowerCase())).map((u, i) => (
+                  <button
+                    key={u.id}
+                    onClick={() => {
+                      const words = text.split(' ');
+                      words[words.length - 1] = `@${u.name?.replace(/\s+/g, '')} `;
+                      setText(words.join(' '));
+                      setShowMentions(false);
+                    }}
+                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-blue-50 transition-colors text-left border-b border-slate-50 last:border-0"
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200">
+                      <img src={getClayAvatar(u.id, u.gender as any, u.name)} className="w-full h-full object-cover" alt="" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-700">{u.name}</p>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter">{(u as any).qualification || 'Professional'}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <textarea
             rows={1}
             value={text}
-            onChange={e => { setText(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px`; }}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+            onChange={e => {
+              const val = e.target.value;
+              setText(val);
+              e.target.style.height = 'auto';
+              e.target.style.height = `${e.target.scrollHeight}px`;
+
+              const lastWord = val.split(' ').pop() || '';
+              if (lastWord.startsWith('@')) {
+                setMentionSearch(lastWord.slice(1));
+                setShowMentions(true);
+              } else {
+                setShowMentions(false);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             placeholder="Type a message"
             className="w-full bg-transparent text-[15px] focus:outline-none resize-none max-h-40 text-slate-800 placeholder:text-slate-400 font-medium leading-relaxed"
           />
