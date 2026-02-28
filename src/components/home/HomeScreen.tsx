@@ -12,9 +12,10 @@ interface HomeScreenProps {
   onRoomSelect: (room: Room) => void;
   onViewAllTrending: () => void;
   onViewAllRooms: () => void;
+  onJobsClick: () => void;
 }
 
-export function HomeScreen({ onRoomSelect, onViewAllTrending, onViewAllRooms }: HomeScreenProps) {
+export function HomeScreen({ onRoomSelect, onViewAllTrending, onViewAllRooms, onJobsClick }: HomeScreenProps) {
   const { data: rooms = [], isLoading } = useRooms();
   const { data: profile } = useProfile();
   const featuredRooms = rooms.slice(0, 3);
@@ -51,9 +52,9 @@ export function HomeScreen({ onRoomSelect, onViewAllTrending, onViewAllRooms }: 
             variant="secondary"
             size="sm"
             className="bg-white/20 text-primary-foreground border-0 hover:bg-white/30"
-            onClick={onViewAllTrending}
+            onClick={onJobsClick}
           >
-            View Trending
+            Job Notifications
           </Button>
         </div>
       </section>

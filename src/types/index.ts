@@ -68,6 +68,26 @@ export interface SalaryPost {
   createdAt: Date;
 }
 
+export interface JobPost {
+  id: string;
+  roomId: string;
+  userId: string;
+  companyName: string;
+  role: string;
+  location: string;
+  workingDays: string;
+  workingHours: string;
+  salaryOffering: string;
+  description: string;
+  applyLink?: string;
+  contactInfo?: string;
+  likes: number;
+  replies: number;
+  isPinned: boolean;
+  createdAt: Date;
+  user?: User;
+}
+
 export interface Tool {
   id: string;
   name: string;

@@ -1,4 +1,4 @@
-import { Room, Message, TrendingPost, User, Tool, SalaryPost } from '@/types';
+import { Room, Message, TrendingPost, User, Tool, SalaryPost, JobPost } from '@/types';
 
 export const currentUser: User = {
   id: 'user-1',
@@ -31,7 +31,7 @@ export const systemRooms: Room[] = [
   },
   {
     id: 'room-career',
-    name: 'Career Counselor & Job Notifications',
+    name: 'Job Postings',
     description: 'Job postings, career guidance and opportunities',
     type: 'career',
     icon: 'Briefcase',
@@ -128,16 +128,61 @@ const salaryMessages: Message[] = [
   { id: 's7', roomId: 'room-salary', userId: 'user-anon-7', content: 'Freshers: Don\'t accept less than ₹20k/month for full-time EMT work, even in smaller cities. Know your worth. Market rate data is on this app!', isAnonymous: true, likes: 78, replies: 16, isPinned: false, createdAt: m(30), user: undefined },
 ];
 
-// ─── CAREER MESSAGES (room-career) ───────────────────────────────────────────
-const careerMessages: Message[] = [
-  { id: 'c1', roomId: 'room-career', userId: 'user-2', content: '🔔 JOB ALERT: Apollo Hospitals Chennai looking for 3 Paramedics. 5yr exp required. ICU/CCU experience preferred. DM me for referral contact!', isAnonymous: false, likes: 56, replies: 14, isPinned: true, createdAt: h(5), user: mockUsers[0] },
-  { id: 'c2', roomId: 'room-career', userId: 'user-3', content: 'Looking to transition from private ambulance to fire department. Any advice on the EMS-FF interview process? What should I focus on preparing?', isAnonymous: false, likes: 32, replies: 15, isPinned: false, createdAt: h(4), user: mockUsers[1] },
-  { id: 'c3', roomId: 'room-career', userId: 'user-4', content: 'Tips for your EMS resume: 1) List specific call volumes 2) Include ROSC rates if you have them 3) Certifications front and center 4) Quantify your skills wherever possible.', isAnonymous: false, likes: 87, replies: 6, isPinned: false, createdAt: h(3), user: mockUsers[2] },
-  { id: 'c4', roomId: 'room-career', userId: 'user-5', content: '🔔 Hiring: Fortis Healthcare Bangalore - Emergency Care Technician. Salary: ₹30k-40k. Requirements: BSc EMT or Diploma + 2yr exp. Apply: careers.fortishealthcare.com', isAnonymous: false, likes: 44, replies: 9, isPinned: false, createdAt: h(2), user: mockUsers[3] },
-  { id: 'c5', roomId: 'room-career', userId: 'user-6', content: 'Career path discussion: EMT → Paramedic → EMS Supervisor → EMS Director → Regional EMS Coordinator. What other paths have people taken? Share your journey!', isAnonymous: false, likes: 63, replies: 24, isPinned: false, createdAt: h(1.5), user: mockUsers[4] },
-  { id: 'c6', roomId: 'room-career', userId: 'user-7', content: 'Important: NREMT reciprocity now accepted in 12 new states. If you hold NREMT certification, you can work across state lines much easier now. Game changer!', isAnonymous: false, likes: 91, replies: 11, isPinned: false, createdAt: m(40), user: mockUsers[5] },
-  { id: 'c7', roomId: 'room-career', userId: 'user-8', content: 'Interview experience: Narayana Hospital asked about specific drug calculations under pressure, 12-lead interpretation, and a scenario-based mega-code. Be very prepared!', isAnonymous: false, likes: 48, replies: 7, isPinned: false, createdAt: m(15), user: mockUsers[6] },
+// ─── CAREER MESSAGES (room-career) - NOW JOB POSTS ───────────────────────────
+export const mockJobPosts: JobPost[] = [
+  {
+    id: 'job1',
+    roomId: 'room-career',
+    userId: 'user-2',
+    companyName: 'Apollo Hospitals',
+    role: 'Paramedic',
+    location: 'Chennai, TN',
+    workingDays: '6 Days/Week',
+    workingHours: '12',
+    salaryOffering: '₹35k-45k/month',
+    description: 'Looking for 3 Paramedics with deep ICU/CCU experience. Must be comfortable with ventilator management and long-distance transfers.',
+    likes: 56,
+    replies: 14,
+    isPinned: true,
+    createdAt: h(5),
+    user: mockUsers[0],
+  },
+  {
+    id: 'job2',
+    roomId: 'room-career',
+    userId: 'user-4',
+    companyName: 'Fortis Healthcare',
+    role: 'Emergency Care Technician',
+    location: 'Bangalore, KA',
+    workingDays: 'Rotational Shifts',
+    workingHours: '8',
+    salaryOffering: '₹30k-40k/month',
+    description: 'BSc EMT or Diploma + 2yr experience required. Will be primarily stationed in the emergency ward assisting with trauma cases.',
+    likes: 44,
+    replies: 9,
+    isPinned: false,
+    createdAt: h(2),
+    user: mockUsers[2],
+  },
+  {
+    id: 'job3',
+    roomId: 'room-career',
+    userId: 'user-7',
+    companyName: 'Reliance Industries (Occupational Health)',
+    role: 'Industrial Paramedic',
+    location: 'Jamnagar, GJ',
+    workingDays: '15 Days On / 15 Off',
+    workingHours: '12',
+    salaryOffering: '₹55k/month + Accommodation',
+    description: 'Seeking an experienced paramedic for our refinery occupational health center. Must have experience with hazmat protocols and industrial trauma.',
+    likes: 89,
+    replies: 22,
+    isPinned: false,
+    createdAt: h(1),
+    user: mockUsers[5],
+  }
 ];
+
 
 // ─── ENTREPRENEURSHIP MESSAGES (room-entrepreneurship) ──────────────────────
 const entrepreneurshipMessages: Message[] = [
@@ -176,7 +221,6 @@ const studentMessages: Message[] = [
 export const mockMessages: Message[] = [
   ...generalMessages,
   ...salaryMessages,
-  ...careerMessages,
   ...entrepreneurshipMessages,
   ...certificationMessages,
   ...studentMessages,
@@ -199,8 +243,8 @@ export const trendingPosts: TrendingPost[] = [
   },
   {
     id: 'trend-3',
-    message: careerMessages[0],
-    room: systemRooms[2],
+    message: entrepreneurshipMessages[0],
+    room: systemRooms[4],
     engagementScore: 98,
     trendingAt: new Date(),
   },

@@ -7,6 +7,7 @@ import { RedditChat } from '@/components/rooms/RedditChat';
 import { WhatsAppChat } from '@/components/rooms/WhatsAppChat';
 import { QAForumChat } from '@/components/rooms/QAForumChat';
 import { LibraryRoom } from '@/components/rooms/LibraryRoom';
+import { JobBoard } from '@/components/rooms/JobBoard';
 import { RoomTopicList } from '@/components/rooms/RoomTopicList';
 import { TrendingPage } from '@/components/trending/TrendingPage';
 import { ToolCard } from '@/components/tools/ToolCard';
@@ -86,7 +87,11 @@ export default function Index() {
       if (selectedRoom.type === 'leadership') {
         return <QAForumChat room={selectedRoom} onBack={handleBackFromChat} />;
       }
-      // All others (General, Students, Certifications, Career, Entrepreneurship, etc.) → WhatsApp Chat
+      // Career → Structured Job Board
+      if (selectedRoom.type === 'career') {
+        return <JobBoard room={selectedRoom} onBack={handleBackFromChat} />;
+      }
+      // All others (General, Students, Certifications, Entrepreneurship, etc.) → WhatsApp Chat
       return <WhatsAppChat room={selectedRoom} onBack={handleBackFromChat} />;
     }
 
@@ -112,6 +117,10 @@ export default function Index() {
             onRoomSelect={handleRoomSelect}
             onViewAllTrending={() => setActiveTab('trending')}
             onViewAllRooms={() => setActiveTab('rooms')}
+            onJobsClick={() => {
+              const careerRoom = rooms.find(r => r.type === 'career');
+              if (careerRoom) handleRoomSelect(careerRoom);
+            }}
           />
         );
 
